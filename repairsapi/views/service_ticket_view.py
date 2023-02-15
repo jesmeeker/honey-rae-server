@@ -68,7 +68,7 @@ class TicketView(ViewSet):
         """
 
         #Select the targeted Ticket using pk
-        ticket = ServiceTicket.objects.get(pk=pk)
+        ticket_to_update = ServiceTicket.objects.get(pk=pk)
 
         # Get the employee id from the client request
         employee_id = request.data['employee']
@@ -76,11 +76,20 @@ class TicketView(ViewSet):
         # Select the employee from the database using that id
         assigned_employee = Employee.objects.get(pk=employee_id)
 
+        customer_id = request.data['customer']
+        assigned_customer = Customer.objects.get(pk=customer_id)
+
         # Assign that Employee instance to the employee property of the ticket
-        ticket.employee = assigned_employee
+        ticket_to_update.employee = assigned_employee
+        ticket_to_update.customer = assigned_customer
+        ticket_to_update.description = request.data['description']
+        ticket_to_update.emergency = request.data['emergency']
+        ticket_to_update.date_completed = request.data['date_completed']
 
         # Save the updated ticket
-        ticket.save()
+        ticket_to_update.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for service tickets
